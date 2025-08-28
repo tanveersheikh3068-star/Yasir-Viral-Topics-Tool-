@@ -22,11 +22,7 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
         margin-bottom: 0.5rem;
-    }
-    .sub-header {
-        color: #4169E1;
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
+        text-align: center;
     }
     .stButton>button {
         background: linear-gradient(45deg, #1E90FF, #4169E1);
@@ -103,8 +99,7 @@ st.markdown("""
 st.set_page_config(page_title="Yasir YouTube Viral Tool", layout="wide", page_icon="🎬")
 
 # Header with your name
-st.markdown('<h1 class="main-header">Yasir YouTube Viral Finder</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Discover trending videos with precise filters</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">Yasir YouTube Viral Topics Tool</h1>', unsafe_allow_html=True)
 
 # Initialize session state for results
 if 'results_df' not in st.session_state:
@@ -367,16 +362,3 @@ elif st.session_state.results_df is None:
     - ❌ Remove some filters (specially subscriber filter)
     - 🎯 Try 'All Categories' first
     """)
-
-# Footer with tips
-st.markdown("---")
-st.markdown("### 💡 Pro Tips:")
-st.write("""
-- **Start with broad filters** first, then refine
-- **For small channels:** Subscribers 1-10,000
-- **For medium channels:** Subscribers 10,000-100,000  
-- **For viral potential:** Views/Subscribers ratio > 10
-- **Try 'All Categories'** to discover new opportunities
-- **Use tabs** to view detailed information about each video
-- **Download thumbnails** for your favorite videos
-""")
