@@ -3,19 +3,94 @@ import requests
 from datetime import datetime, timedelta
 import pandas as pd
 
-# YouTube API Key
+# YouTube API Key - Aap ki key yahan add kar di hai
 API_KEY = "AIzaSyBpvV27UugXepVM_MrXtKtqr3rza9h0s7w"
 YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos"
 YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels"
 
+# Custom CSS for Professional 3D Theme
+st.markdown("""
+<style>
+    .main-header {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, #FF4B2B, #FF416C);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        margin-bottom: 0.5rem;
+    }
+    .sub-header {
+        color: #FF416C;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    .stButton>button {
+        background: linear-gradient(45deg, #FF4B2B, #FF416C);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 0.8rem 2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
+    }
+    .sidebar .sidebar-content {
+        background: linear-gradient(180deg, #2c3e50, #3498db);
+        color: white;
+    }
+    .stNumberInput, .stTextInput, .stSelectbox, .stSlider {
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 1rem;
+    }
+    .stExpander {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        border: none;
+    }
+    .success-message {
+        background: linear-gradient(135deg, #00b09b, #96c93d);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+    .video-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 15px;
+        margin: 10px 0;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .video-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Streamlit App Configuration
-st.set_page_config(page_title="Ultimate YouTube Viral Finder", layout="wide")
-st.title("🎬 Ultimate YouTube Viral Topics Tool")
+st.set_page_config(page_title="Yasir YouTube Viral Tool", layout="wide", page_icon="🎬")
+
+# Header with your name
+st.markdown('<h1 class="main-header">Yasir YouTube Viral Topics Tool</h1>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Find hidden viral gems with advanced filters</p>', unsafe_allow_html=True)
 
 # Sidebar for Filters
 with st.sidebar:
-    st.header("🔍 Custom Search Options")
+    st.markdown("### 🔍 Custom Search Options")
     
     # A to Z Categories
     all_categories = {
@@ -51,48 +126,47 @@ with st.sidebar:
     # Show keywords for selected category
     if selected_category != "Other":
         keywords = all_categories[selected_category]
-        st.write(f"**Keywords in {selected_category}:**")
-        st.write(", ".join(keywords))
-    else:
-        st.info("Select 'Custom Search' below for other topics")
+        st.write(f"**Keywords:** {', '.join(keywords[:3])}...")
     
     # Custom Search Option
-    st.subheader("🔎 Custom Search")
-    custom_search = st.text_input("Enter ANY Other Keyword (Optional)", "",
+    st.markdown("---")
+    st.markdown("### 🔎 Custom Search")
+    custom_search = st.text_input("Enter ANY Other Keyword", "",
         help="Agar aap ki category yahan nahi hai, toh koi bhi keyword yahan likhein")
     
     # Subscriber Range (Fully Customizable)
-    st.subheader("👥 Subscriber Range")
+    st.markdown("---")
+    st.markdown("### 👥 Subscriber Range")
     min_subs = st.number_input("Minimum Subscribers", 0, 100000000, 0,
         help="Kitne kam subscribers hon? 0 ya koi bhi value")
-    max_subs = st.number_input("Maximum Subscribers", 0, 100000000, 1000000,
-        help="Kitne zyada subscribers hon? 1000000 ya koi bhi value")
+    max_subs = st.number_input("Maximum Subscribers", 0, 100000000, 50000,
+        help="Kitne zyada subscribers hon? 50000 ya koi bhi value")
     
     # Views Range (Fully Customizable)
-    st.subheader("👀 Views Range")
+    st.markdown("### 👀 Views Range")
     min_views = st.number_input("Minimum Views", 0, 1000000000, 1000,
         help="Kitne kam views hon? 1000 ya koi bhi value")
-    max_views = st.number_input("Maximum Views", 0, 1000000000, 10000000,
-        help="Kitne zyada views hon? 10000000 ya koi bhi value")
+    max_views = st.number_input("Maximum Views", 0, 1000000000, 1000000,
+        help="Kitne zyada views hon? 1000000 ya koi bhi value")
     
     # Date Range
-    st.subheader("📅 Upload Date")
-    days = st.slider("Last How Many Days?", 1, 365, 7,
+    st.markdown("### 📅 Upload Date")
+    days = st.slider("Last How Many Days?", 1, 365, 30,
         help="Aaj se kitne din pichle tak ke videos dekhein")
 
 # Main Search Interface
-st.subheader("🎯 Search Settings")
-num_results = st.slider("Number of Results per Keyword", 5, 50, 10)
+st.markdown("### 🎯 Search Settings")
+num_results = st.slider("Number of Results per Keyword", 5, 50, 15)
 
 # Use custom search or selected category
 if custom_search:
     keywords = [custom_search]
-    st.success(f"Custom Search: {custom_search}")
+    st.markdown(f'<div class="success-message">Custom Search: {custom_search}</div>', unsafe_allow_html=True)
 else:
     keywords = all_categories[selected_category]
-    st.success(f"Searching in: {selected_category}")
+    st.markdown(f'<div class="success-message">Searching in: {selected_category}</div>', unsafe_allow_html=True)
 
-if st.button("🚀 Find Viral Videos", type="primary", use_container_width=True):
+if st.button("🚀 Find Viral Videos", use_container_width=True):
     try:
         # Calculate date range
         start_date = (datetime.utcnow() - timedelta(days=days)).isoformat("T") + "Z"
@@ -102,7 +176,7 @@ if st.button("🚀 Find Viral Videos", type="primary", use_container_width=True)
         status_text = st.empty()
 
         for i, keyword in enumerate(keywords):
-            status_text.text(f"🔍 Searching: {keyword}")
+            status_text.text(f"🔍 Searching: {keyword}...")
             
             # Search parameters
             search_params = {
@@ -135,9 +209,12 @@ if st.button("🚀 Find Viral Videos", type="primary", use_container_width=True)
             stats_data = stats_response.json()
 
             # Get channel statistics
-            channel_params = {"part": "statistics", "id": ",".join(channel_ids), "key": API_KEY}
-            channel_response = requests.get(YOUTUBE_CHANNEL_URL, params=channel_params)
-            channel_data = channel_response.json()
+            if channel_ids:
+                channel_params = {"part": "statistics", "id": ",".join(channel_ids), "key": API_KEY}
+                channel_response = requests.get(YOUTUBE_CHANNEL_URL, params=channel_params)
+                channel_data = channel_response.json()
+            else:
+                channel_data = {"items": []}
 
             if "items" not in stats_data:
                 continue
@@ -155,6 +232,10 @@ if st.button("🚀 Find Viral Videos", type="primary", use_container_width=True)
                     if ((min_subs <= subs <= max_subs) and 
                         (min_views <= views <= max_views)):
                         
+                        # Get thumbnail
+                        thumbnails = video["snippet"].get("thumbnails", {})
+                        thumbnail_url = thumbnails.get("high", {}).get("url") or thumbnails.get("medium", {}).get("url") or thumbnails.get("default", {}).get("url")
+                        
                         all_results.append({
                             "Title": video["snippet"].get("title", "N/A"),
                             "Description": video["snippet"].get("description", "")[:200],
@@ -163,9 +244,10 @@ if st.button("🚀 Find Viral Videos", type="primary", use_container_width=True)
                             "Subscribers": subs,
                             "Channel": video["snippet"].get("channelTitle", "N/A"),
                             "Keyword": keyword,
-                            "Thumbnail": video["snippet"].get("thumbnails", {}).get("high", {}).get("url", "")
+                            "Thumbnail": thumbnail_url,
+                            "Published": video["snippet"].get("publishedAt", "")[:10]
                         })
-                except:
+                except Exception as e:
                     continue
             
             progress_bar.progress((i + 1) / len(keywords))
@@ -183,52 +265,51 @@ if st.button("🚀 Find Viral Videos", type="primary", use_container_width=True)
                 titles = "\n".join(df["Title"].tolist())
                 st.download_button("📝 Download Titles", titles, "video_titles.txt", "text/plain")
             with col3:
-                st.info("🖼️ Thumbnails available in CSV")
+                st.info("🎬 Videos found!")
 
-            # Show results
-            st.subheader(f"🎉 Found {len(all_results)} Videos!")
+            # Show results with beautiful cards
+            st.markdown(f"### 🎉 Found {len(all_results)} Viral Videos!")
             
             for _, row in df.iterrows():
-                with st.expander(f"{row['Title']} ({row['Views']:,} views)"):
-                    col1, col2, col3 = st.columns([1, 2, 1])
-                    
-                    with col1:
-                        if row["Thumbnail"]:
-                            st.image(row["Thumbnail"], width=150)
-                    
-                    with col2:
-                        st.write(f"**Channel:** {row['Channel']}")
-                        st.write(f"**Subscribers:** {row['Subscribers']:,}")
-                        st.write(f"**Views:** {row['Views']:,}")
-                        st.write(f"**Keyword:** {row['Keyword']}")
-                    
-                    with col3:
-                        st.markdown(f"[🎥 Watch Video]({row['URL']})")
-                        st.write(f"**Score:** {row['Views']/max(1, row['Subscribers']):.1f}x")
-                    
-                    st.write(f"**Description:** {row['Description']}...")
+                st.markdown(f"""
+                <div class="video-card">
+                    <h3>{row['Title']}</h3>
+                    <p><strong>📺 Channel:</strong> {row['Channel']}</p>
+                    <p><strong>👥 Subscribers:</strong> {row['Subscribers']:,}</p>
+                    <p><strong>👀 Views:</strong> {row['Views']:,}</p>
+                    <p><strong>🔍 Keyword:</strong> {row['Keyword']}</p>
+                    <p><strong>📅 Published:</strong> {row['Published']}</p>
+                    <p><a href="{row['URL']}" target="_blank" style="color: white; text-decoration: none;">
+                       🎥 Watch Video</a></p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                with st.expander("Description"):
+                    st.write(row['Description'])
 
         else:
             st.warning("""
-            ❌ No videos found with your filters!
+            ### ❌ No videos found with your filters!
             
             **Try these solutions:**
-            1. 📈 Increase Maximum Subscribers/Views values
-            2. 📅 Increase Days to search
-            3. 🔍 Try different keywords
-            4. ❌ Remove some filters
+            - 📈 Increase Maximum Subscribers/Views values
+            - 📅 Increase Days to search (try 30+ days)
+            - 🔍 Try different keywords
+            - ❌ Remove some filters (specially subscriber filter)
+            - 🎯 Try 'All Categories' first
             """)
 
     except Exception as e:
         st.error(f"Error: {str(e)}")
-        st.info("🔄 Please try again with different filters")
+        st.info("🔄 Please try again with different filters or try again later")
 
 # Footer with tips
 st.markdown("---")
-st.subheader("💡 Pro Tips:")
+st.markdown("### 💡 Pro Tips:")
 st.write("""
-- **Subscriber Range:** 0-5000 (Small channels), 0-100000 (Medium), 0-1000000 (Large)
-- **Views Range:** 1000-100000 (Good engagement), 100000+ (Viral potential)
-- **Custom Search:** Koi bhi topic search karne ke liye!
-- **Score:** (Views/Subscribers) - Higher score = better engagement
+- **Start with broad filters** first, then refine
+- **For small channels:** Subscribers 0-10,000
+- **For medium channels:** Subscribers 10,000-100,000  
+- **For viral potential:** Views/Subscribers ratio > 10
+- **Try 'All Categories'** to discover new opportunities
 """)
