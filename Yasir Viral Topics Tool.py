@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 from datetime import datetime, timedelta
 import pandas as pd
-import random
 
 # YouTube API Key
 API_KEY = "AIzaSyBpvV27UugXepVM_MrXtKtqr3rza9h0s7w"
@@ -10,252 +9,198 @@ YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos"
 YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels"
 
-# Custom CSS for Professional Theme
-st.markdown("""
-<style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        background: linear-gradient(45deg, #FF4B2B, #FF416C);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-        margin-bottom: 0.5rem;
-        text-align: center;
-    }
-    .sub-header {
-        color: #FF416C;
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-    .stButton>button {
-        background: linear-gradient(45deg, #FF4B2B, #FF416C);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        padding: 0.8rem 2rem;
-        font-weight: bold;
-        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-    .stButton>button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
-    }
-    .video-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        border-radius: 15px;
-        margin: 15px 0;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        color: white;
-        transition: all 0.3s ease;
-        border: 2px solid rgba(255,255,255,0.1);
-    }
-    .video-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-    }
-    .success-box {
-        background: linear-gradient(135deg, #00b09b, #96c93d);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 15px 0;
-        text-align: center;
-        font-weight: bold;
-    }
-    .warning-box {
-        background: linear-gradient(135deg, #ff9966, #ff5e62);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 15px 0;
-        text-align: center;
-    }
-    .info-box {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 15px 0;
-        text-align: center;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # Streamlit App Configuration
-st.set_page_config(page_title="Yasir YouTube Viral Tool", layout="wide", page_icon="🎬")
+st.set_page_config(page_title="Yasir YouTube Viral Tool", layout="wide")
+st.title("🎬 Yasir YouTube Viral Topics Tool")
 
-# Header with your name
-st.markdown('<h1 class="main-header">🔥 Yasir YouTube Viral Finder</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Find hidden viral videos with any keyword | Unlimited searches</p>', unsafe_allow_html=True)
+# Input Fields
+days = st.number_input("Enter Days to Search (1-30):", min_value=1, max_value=30, value=7)
 
-# Sample data for when no results found
-SAMPLE_VIDEOS = [
-    {
-        "Title": "True Horror Story That Will Give You Nightmares",
-        "Channel": "Dark Tales",
-        "Views": 84500,
-        "Subscribers": 3200,
-        "URL": "https://www.youtube.com/watch?v=abcdefghijk",
-        "Description": "This true horror story happened to me last summer and I still can't sleep properly...",
-        "Keyword": "true horror"
-    },
-    {
-        "Title": "Scary Camping Experience in Haunted Forest",
-        "Channel": "Adventure Seekers",
-        "Views": 126000,
-        "Subscribers": 4800,
-        "URL": "https://www.youtube.com/watch?v=lmnoqrstuvw",
-        "Description": "Our camping trip turned into a nightmare when we encountered paranormal activity...",
-        "Keyword": "scary stories"
-    },
-    {
-        "Title": "Ghost Sightings Caught on Camera - Real Evidence",
-        "Channel": "Paranormal Investigators",
-        "Views": 95000,
-        "Subscribers": 4100,
-        "URL": "https://www.youtube.com/watch?v=xyz12345678",
-        "Description": "We captured unbelievable ghost evidence during our investigation of haunted location...",
-        "Keyword": "ghost stories"
-    }
+# List of broader keywords
+keywords = [
+    "True Horror Stories", "Scary Stories to Tell in the Dark", "Real Life Horror Stories",
+    "Creepy Horror Stories", "Ghost Stories", "True Scary Stories", "Haunted House Stories",
+    "Paranormal Activity Stories", "Sleep Paralysis Horror Stories", "Scary Story Animated",
+    "Short Horror Film", "Reddit Horror Stories", "Two Sentence Horror Stories", "Dark Web Horror Stories",
+    "Scary Camping Stories", "Haunted Places Horror", "Creepy Pasta Horror Stories",
+    "Urban Legend Horror Stories", "True Crime Horror Stories", "Scary Bedtime Stories",
+    "Real Ghost Stories", "Nightmare Horror Stories", "Creepy True Stories",
+    "Scary Experience Stories", "Paranormal Horror Stories"
 ]
 
-# Main Search Interface
-col1, col2 = st.columns([2, 1])
+# Custom keyword option
+st.markdown("### 🔍 Custom Keyword Search")
+custom_keyword = st.text_input("Enter your own keyword (optional):", "")
 
-with col1:
-    st.markdown("### 🎯 Enter Your Keyword")
-    custom_keyword = st.text_input("Type any keyword you want to search:", "true horror stories",
-        help="Koi bhi keyword daalein - horror, comedy, music, etc.")
-    
-    st.markdown("### 📅 Days to Search")
-    days = st.number_input("How many days back to search?", 1, 365, 30,
-        help="1-365 days. Zyada days = zyada results")
+# Replace keywords if custom keyword is provided
+if custom_keyword:
+    keywords = [custom_keyword]
 
-with col2:
-    st.markdown("### 👥 Subscriber Range")
-    min_subs = st.number_input("Min Subscribers", 0, 1000000, 1000)
-    max_subs = st.number_input("Max Subscribers", 0, 10000000, 10000)
-    
-    st.markdown("### 👀 Views Range")
-    min_views = st.number_input("Min Views", 0, 10000000, 5000)
-    max_views = st.number_input("Max Views", 0, 100000000, 50000)
-
-# Search button
-if st.button("🚀 SEARCH VIRAL VIDEOS", use_container_width=True):
+# Fetch Data Button
+if st.button("🚀 Fetch Data"):
     try:
         # Calculate date range
-        start_date = (datetime.utcnow() - timedelta(days=days)).isoformat("T") + "Z"
-        
-        # Show searching message
-        st.markdown(f'<div class="info-box">🔍 Searching for: "{custom_keyword}" | Last {days} days</div>', unsafe_allow_html=True)
-        
-        # Search parameters
-        search_params = {
-            "part": "snippet",
-            "q": custom_keyword,
-            "type": "video",
-            "order": "viewCount",
-            "publishedAfter": start_date,
-            "maxResults": 10,
-            "key": API_KEY,
-        }
-
-        # Fetch video data
-        response = requests.get(YOUTUBE_SEARCH_URL, params=search_params)
-        data = response.json()
-
+        start_date = (datetime.utcnow() - timedelta(days=int(days))).isoformat("T") + "Z"
         all_results = []
-        
-        if "items" in data and data["items"]:
+
+        # Iterate over the list of keywords
+        for keyword in keywords:
+            st.write(f"**Searching:** {keyword}")
+
+            # Define search parameters
+            search_params = {
+                "part": "snippet",
+                "q": keyword,
+                "type": "video",
+                "order": "viewCount",
+                "publishedAfter": start_date,
+                "maxResults": 10,
+                "key": API_KEY,
+            }
+
+            # Fetch video data
+            response = requests.get(YOUTUBE_SEARCH_URL, params=search_params)
+            data = response.json()
+
+            # Check if "items" key exists
+            if "items" not in data or not data["items"]:
+                st.warning(f"No videos found for keyword: {keyword}")
+                continue
+
             videos = data["items"]
-            video_ids = [video["id"]["videoId"] for video in videos]
-            
-            # Get video statistics
+            video_ids = [video["id"]["videoId"] for video in videos if "id" in video and "videoId" in video["id"]]
+            channel_ids = [video["snippet"]["channelId"] for video in videos if "snippet" in video and "channelId" in video["snippet"]]
+
+            if not video_ids or not channel_ids:
+                st.warning(f"Skipping keyword: {keyword} due to missing video/channel data.")
+                continue
+
+            # Fetch video statistics
             stats_params = {"part": "statistics", "id": ",".join(video_ids), "key": API_KEY}
             stats_response = requests.get(YOUTUBE_VIDEO_URL, params=stats_params)
             stats_data = stats_response.json()
-            
-            # Process results
-            for video, stat in zip(videos, stats_data["items"]):
-                try:
-                    views = int(stat["statistics"].get("viewCount", 0))
-                    # For demo, generate random subscribers between min_subs and max_subs
-                    subs = random.randint(min_subs, max_subs)
-                    
-                    if (min_views <= views <= max_views) and (min_subs <= subs <= max_subs):
-                        all_results.append({
-                            "Title": video["snippet"].get("title", "N/A"),
-                            "Description": video["snippet"].get("description", "No description")[:150] + "...",
-                            "URL": f"https://www.youtube.com/watch?v={video['id']['videoId']}",
-                            "Views": views,
-                            "Subscribers": subs,
-                            "Channel": video["snippet"].get("channelTitle", "Unknown Channel"),
-                            "Keyword": custom_keyword
-                        })
-                except:
-                    continue
-        
-        # If no results found, use sample data
-        if not all_results:
-            st.markdown(f'<div class="warning-box">⚠️ No videos found with exact filters. Showing similar popular videos:</div>', unsafe_allow_html=True)
-            all_results = SAMPLE_VIDEOS
-        
+
+            if "items" not in stats_data or not stats_data["items"]:
+                st.warning(f"Failed to fetch video statistics for keyword: {keyword}")
+                continue
+
+            # Fetch channel statistics
+            channel_params = {"part": "statistics", "id": ",".join(channel_ids), "key": API_KEY}
+            channel_response = requests.get(YOUTUBE_CHANNEL_URL, params=channel_params)
+            channel_data = channel_response.json()
+
+            if "items" not in channel_data or not channel_data["items"]:
+                st.warning(f"Failed to fetch channel statistics for keyword: {keyword}")
+                continue
+
+            stats = stats_data["items"]
+            channels = channel_data["items"]
+
+            # Collect results
+            for video, stat, channel in zip(videos, stats, channels):
+                title = video["snippet"].get("title", "N/A")
+                description = video["snippet"].get("description", "")[:200]
+                video_id = video["id"]["videoId"]
+                video_url = f"https://www.youtube.com/watch?v={video_id}"
+                views = int(stat["statistics"].get("viewCount", 0))
+                subs = int(channel["statistics"].get("subscriberCount", 0))
+                
+                # Get thumbnail URL (high quality if available)
+                thumbnails = video["snippet"].get("thumbnails", {})
+                thumbnail_url = ""
+                if "high" in thumbnails:
+                    thumbnail_url = thumbnails["high"]["url"]
+                elif "medium" in thumbnails:
+                    thumbnail_url = thumbnails["medium"]["url"]
+                elif "default" in thumbnails:
+                    thumbnail_url = thumbnails["default"]["url"]
+
+                # Only include channels with fewer than 50,000 subscribers
+                if subs < 50000:
+                    all_results.append({
+                        "Title": title,
+                        "Description": description,
+                        "URL": video_url,
+                        "Video ID": video_id,
+                        "Views": views,
+                        "Subscribers": subs,
+                        "Channel": video["snippet"].get("channelTitle", "N/A"),
+                        "Thumbnail": thumbnail_url,
+                        "Keyword": keyword
+                    })
+
         # Display results
-        st.markdown(f'<div class="success-box">🎉 Found {len(all_results)} Videos Matching Your Criteria!</div>', unsafe_allow_html=True)
-        
-        for result in all_results:
-            st.markdown(f"""
-            <div class="video-card">
-                <h3>📺 {result['Title']}</h3>
-                <p><strong>🏢 Channel:</strong> {result['Channel']}</p>
-                <p><strong>👥 Subscribers:</strong> {result['Subscribers']:,}</p>
-                <p><strong>👀 Views:</strong> {result['Views']:,}</p>
-                <p><strong>🔍 Keyword:</strong> {result['Keyword']}</p>
-                <p><strong>📝 Description:</strong> {result['Description']}</p>
-                <p><a href="{result['URL']}" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">
-                   🎥 WATCH THIS VIDEO</a></p>
-            </div>
-            """, unsafe_allow_html=True)
+        if all_results:
+            st.success(f"**Found {len(all_results)} results across all keywords!**")
+            
+            # Create DataFrame for download
+            df = pd.DataFrame(all_results)
+            
+            # Download buttons
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                # Download CSV
+                csv = df.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download CSV",
+                    data=csv,
+                    file_name="youtube_viral_videos.csv",
+                    mime="text/csv"
+                )
+            
+            with col2:
+                # Download Titles only
+                titles = "\n".join([f"{i+1}. {row['Title']}" for i, row in enumerate(all_results)])
+                st.download_button(
+                    label="📝 Download Titles",
+                    data=titles,
+                    file_name="video_titles.txt",
+                    mime="text/plain"
+                )
+            
+            with col3:
+                # Thumbnail download guide
+                st.info("🖼️ To download thumbnails, replace 'VIDEO_ID' in this URL: https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg")
+
+            # Display results with thumbnails
+            for result in all_results:
+                col1, col2 = st.columns([1, 3])
+                
+                with col1:
+                    if result["Thumbnail"]:
+                        st.image(result["Thumbnail"], use_column_width=True)
+                    else:
+                        st.write("No thumbnail available")
+                
+                with col2:
+                    st.markdown(f"### {result['Title']}")
+                    st.markdown(f"**Channel:** {result['Channel']}")
+                    st.markdown(f"**Subscribers:** {result['Subscribers']:,}")
+                    st.markdown(f"**Views:** {result['Views']:,}")
+                    st.markdown(f"**Keyword:** {result['Keyword']}")
+                    
+                    # Video link that works
+                    st.markdown(f"[🎥 Watch Video on YouTube]({result['URL']})")
+                    
+                    st.markdown(f"**Description:** {result['Description']}...")
+                
+                st.markdown("---")
+                
+        else:
+            st.warning("No results found for channels with fewer than 50,000 subscribers. Try increasing the subscriber limit or search days.")
 
     except Exception as e:
-        st.error(f"Error: {str(e)}")
-        st.markdown(f'<div class="warning-box">Showing sample trending videos instead:</div>', unsafe_allow_html=True)
-        
-        # Show sample data on error
-        for result in SAMPLE_VIDEOS:
-            st.markdown(f"""
-            <div class="video-card">
-                <h3>📺 {result['Title']}</h3>
-                <p><strong>🏢 Channel:</strong> {result['Channel']}</p>
-                <p><strong>👥 Subscribers:</strong> {result['Subscribers']:,}</p>
-                <p><strong>👀 Views:</strong> {result['Views']:,}</p>
-                <p><strong>🔍 Keyword:</strong> {result['Keyword']}</p>
-                <p><strong>📝 Description:</strong> {result['Description']}</p>
-                <p><a href="{result['URL']}" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">
-                   🎥 WATCH THIS VIDEO</a></p>
-            </div>
-            """, unsafe_allow_html=True)
+        st.error(f"An error occurred: {e}")
+        st.info("Please check your internet connection and try again.")
 
-# Footer
+# Add instructions
 st.markdown("---")
-st.markdown("### 💡 How To Use:")
+st.markdown("### 💡 Instructions:")
 st.write("""
-1. **🔍 Enter any keyword** you want to search
-2. **📅 Select how many days** back to search (1-365)
-3. **👥 Set subscriber range** (1000-10000 for small channels)
-4. **👀 Set views range** (5000-50000 for good engagement)
-5. **🚀 Click SEARCH button** and get results!
-""")
-
-st.markdown("### 🌟 Pro Tips:")
-st.write("""
-- **Start with broad searches** then refine
-- **Small channels** (1000-10000 subscribers) often have viral potential
-- **Views/Subscribers ratio > 10** = Good engagement
-- **Try different keywords** to find hidden gems
+1. Enter number of days to search (1-30)
+2. Use custom keyword or default horror keywords
+3. Click 'Fetch Data' to find viral videos
+4. Download results as CSV or text
+5. Use YouTube links to watch videos
 """)
