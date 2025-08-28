@@ -134,25 +134,25 @@ with st.sidebar:
     custom_search = st.text_input("Enter ANY Other Keyword", "",
         help="Agar aap ki category yahan nahi hai, toh koi bhi keyword yahan likhein")
     
+    # Date Range
+    st.markdown("### 📅 Upload Date")
+    days = st.number_input("Last How Many Days?", 1, 365, 30,
+        help="Aaj se kitne din pichle tak ke videos dekhein")
+    
     # Subscriber Range (Fully Customizable)
     st.markdown("---")
     st.markdown("### 👥 Subscriber Range")
-    min_subs = st.number_input("Minimum Subscribers", 0, 100000000, 0,
-        help="Kitne kam subscribers hon? 0 ya koi bhi value")
-    max_subs = st.number_input("Maximum Subscribers", 0, 100000000, 50000,
-        help="Kitne zyada subscribers hon? 50000 ya koi bhi value")
+    min_subs = st.number_input("Minimum Subscribers", 1, 10000000, 1,
+        help="Kitne kam subscribers hon? 1 ya koi bhi value")
+    max_subs = st.number_input("Maximum Subscribers", 1, 10000000, 1000000,
+        help="Kitne zyada subscribers hon? 1000000 ya koi bhi value")
     
     # Views Range (Fully Customizable)
     st.markdown("### 👀 Views Range")
-    min_views = st.number_input("Minimum Views", 0, 1000000000, 1000,
-        help="Kitne kam views hon? 1000 ya koi bhi value")
-    max_views = st.number_input("Maximum Views", 0, 1000000000, 1000000,
-        help="Kitne zyada views hon? 1000000 ya koi bhi value")
-    
-    # Date Range
-    st.markdown("### 📅 Upload Date")
-    days = st.slider("Last How Many Days?", 1, 365, 30,
-        help="Aaj se kitne din pichle tak ke videos dekhein")
+    min_views = st.number_input("Minimum Views", 1, 100000000, 1,
+        help="Kitne kam views hon? 1 ya koi bhi value")
+    max_views = st.number_input("Maximum Views", 1, 100000000, 10000000,
+        help="Kitne zyada views hon? 10000000 ya koi bhi value")
 
 # Main Search Interface
 st.markdown("### 🎯 Search Settings")
@@ -308,7 +308,7 @@ st.markdown("---")
 st.markdown("### 💡 Pro Tips:")
 st.write("""
 - **Start with broad filters** first, then refine
-- **For small channels:** Subscribers 0-10,000
+- **For small channels:** Subscribers 1-10,000
 - **For medium channels:** Subscribers 10,000-100,000  
 - **For viral potential:** Views/Subscribers ratio > 10
 - **Try 'All Categories'** to discover new opportunities
